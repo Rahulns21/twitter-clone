@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock title %}
+
+{% block content %}
+
+<div class="col-md-6 offset-md-3">
+    <h1>Login</h1>
+
+    <br>
+
+    <form method="POST" action="{% url "twitter:login" %}">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <input type="text" class="form-control" id="username" name="username" placeholder="Username" required oninput="checkFormFields()">
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required oninput="checkFormFields()">
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="showPasswordCheck" onclick="togglePasswordVisibility()" disabled>
+            <label class="form-check-label" for="showPasswordCheck">Show Password</label>
+        </div>
+        <button type="submit" class="btn btn-secondary" id="loginButton" disabled>Login</button>
+    </form>
+
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script>
+  function togglePasswordVisibility() {
+      var passwordField = document.getElementById("password");
+      if (passwordField.type === "password") {
+          passwordField.type = "text";
+      } else {
+          passwordField.type = "password";
+      }
+  }
+
+  function checkFormFields() {
+      var usernameField = document.getElementById("username");
+      var passwordField = document.getElementById("password");
+      var showPasswordCheck = document.getElementById("showPasswordCheck");
+      var loginButton = document.getElementById("loginButton");
+
+      if (passwordField.value.length > 0) {
+          showPasswordCheck.disabled = false;
+      } else {
+          showPasswordCheck.disabled = true;
+      }
+
+      if (usernameField.value.length > 0 && passwordField.value.length > 0) {
+          loginButton.disabled = false;
+      } else {
+          loginButton.disabled = true;
+      }
+  }
+</script>
+
+{% endblock scripts %}

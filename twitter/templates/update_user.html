@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Update Profile{% endblock title %}
+
+{% block content %}
+<div class="col-md-6 offset-md-3">
+    <h1>Update Profile</h1>
+    <br>
+    
+    <form id="updateForm" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {{ profile_form.as_p }}
+        <button type="submit" class="btn btn-secondary" id="updateButton" disabled>Update</button>
+        <a href="{% url "twitter:profile" pk=request.user.pk %}" class="btn btn-danger">Cancel</a>
+    </form>
+    <br>
+    
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('updateForm');
+        const updateButton = document.getElementById('updateButton');
+
+        // Dynamically assign ID to the clear image checkbox
+        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.name.includes('clear')) {  // Assuming 'clear' is part of the checkbox name
+                checkbox.id = 'clear_image';
+            }
+        });
+
+        const clearImageCheckbox = document.getElementById('clear_image');
+        
+        // Track changes in the form fields
+        const originalFormValues = {};
+        Array.from(form.elements).forEach(element => {
+            if (element.tagName.toLowerCase() !== 'button' && element.name) {
+                originalFormValues[element.name] = element.value.trim(); // Store trimmed initial values
+                element.addEventListener('input', function() {
+                    checkFormChanges();
+                });
+            }
+        });
+
+        if (clearImageCheckbox) {
+            clearImageCheckbox.addEventListener('change', function() {
+                checkFormChanges();
+            });
+        }
+        
+        function checkFormChanges() {
+            let isTextChanged = false;
+            let isCheckboxChecked = clearImageCheckbox && clearImageCheckbox.checked;
+
+            Array.from(form.elements).forEach(element => {
+                if (element.name && element.tagName.toLowerCase() !== 'button') {
+                    if (element.type !== 'checkbox' && element.value.trim() !== originalFormValues[element.name]) {
+                        isTextChanged = true;
+                    }
+                }
+            });
+
+            if (isTextChanged || isCheckboxChecked) {
+                updateButton.removeAttribute('disabled');
+            } else {
+                updateButton.setAttribute('disabled', 'disabled');
+            }
+        }
+    });
+</script>
+{% endblock scripts %}
